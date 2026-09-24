@@ -32,6 +32,11 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# заявки клиентов: у каждой установки свой файл, в репозиторий не попадает
+/data/bookings.json
+/data/bookings.json.corrupt-*
 
 # vercel
 .vercel

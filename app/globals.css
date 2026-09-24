@@ -1,26 +1,230 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Палитра: графит (металл/мастерская) + оранжевый акцент */
+  --color-ink: #0c0f13;
+  --color-ink-2: #151a21;
+  --color-paper: #f5f6f8;
+  --color-line: #e3e6ea;
+  --color-muted: #58616f;
+  --color-brand: #f97316;
+  --color-brand-2: #ea6a0a;
+  --color-brand-soft: #fff3e8;
+  /* Оранжевый для ТЕКСТА на светлом фоне: #ea6a0a даёт 2,96–3,20:1
+     (ниже порога 4,5 для мелкого текста), этот оттенок — 4,8–5,2:1.
+     Яркий брендовый оранжевый остаётся на тёмных секциях и заливках. */
+  --color-brand-ink: #c2410c;
+
+  --breakpoint-xs: 22.5rem; /* 360px */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    overflow-x: clip;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    background-color: #fff;
+    color: var(--color-ink);
+    overflow-x: clip;
+    font-synthesis-weight: none;
+  }
+
+  ::selection {
+    background-color: var(--color-brand);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .wrap {
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .wrap {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
+    text-align: center;
+    /* Все кнопки сайта — не ниже 44px по высоте: на телефоне это минимум
+       для уверенного попадания пальцем (нижняя панель, «Уточнить цену»,
+       «Связаться», кнопки в контактах давали 40–42px). */
+    min-height: 2.75rem;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease,
+      border-color 0.15s ease,
+      transform 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .btn:active {
+    transform: translateY(1px);
+  }
+
+  .btn-primary {
+    background-color: var(--color-brand);
+    color: var(--color-ink);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-brand-2);
+  }
+
+  .btn-dark {
+    background-color: var(--color-ink);
+    color: #fff;
+  }
+
+  .btn-dark:hover {
+    background-color: var(--color-ink-2);
+  }
+
+  .btn-outline {
+    background-color: transparent;
+    color: var(--color-ink);
+    border: 1px solid var(--color-line);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--color-ink);
+  }
+
+  .btn-outline-light {
+    background-color: rgb(255 255 255 / 0.06);
+    color: #fff;
+    border: 1px solid rgb(255 255 255 / 0.22);
+  }
+
+  .btn-outline-light:hover {
+    background-color: rgb(255 255 255 / 0.12);
+  }
+
+  .card {
+    background-color: #fff;
+    border: 1px solid var(--color-line);
+    border-radius: 1rem;
+  }
+
+  .section-title {
+    font-size: clamp(1.5rem, 5vw, 2.25rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.12;
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* Раскрывающийся список прайса: длинные строки с ценой справа */
+  .price-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.625rem 0;
+    border-bottom: 1px dashed var(--color-line);
+  }
+
+  .price-row:last-child {
+    border-bottom: 0;
+  }
+
+  .scroll-x {
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Поля формы записи */
+  .field {
+    display: block;
+    width: 100%;
+    /* 48px и шрифт 16px: удобная цель для пальца и отсутствие авто-зума в iOS */
+    min-height: 3rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.75rem;
+    background-color: #fff;
+    padding: 0.75rem 0.875rem;
+    font-size: 1rem;
+    line-height: 1.4;
+    color: var(--color-ink);
+    outline: none;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  .field::placeholder {
+    color: rgb(88 97 111 / 0.6);
+  }
+
+  .field:focus {
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 3px rgb(249 115 22 / 0.18);
+  }
+
+  .field[aria-invalid="true"] {
+    border-color: #dc2626;
+  }
+
+  textarea.field {
+    min-height: 5.5rem;
+    resize: vertical;
+  }
+
+  select.field {
+    appearance: none;
+    padding-right: 2.5rem;
+    background-image:
+      linear-gradient(45deg, transparent 50%, var(--color-ink) 50%),
+      linear-gradient(135deg, var(--color-ink) 50%, transparent 50%);
+    background-position:
+      calc(100% - 1.25rem) calc(50% + 1px),
+      calc(100% - 0.95rem) calc(50% + 1px);
+    background-size:
+      6px 6px,
+      6px 6px;
+    background-repeat: no-repeat;
+  }
 }
