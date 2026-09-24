@@ -61,6 +61,19 @@
 
 ---
 
+## Переменные для Vercel (Settings → Environment Variables)
+
+Достаточно этих — значения для демо-версии:
+
+| Переменная | Значение для демо | Зачем |
+|---|---|---|
+| `ADMIN_PASSWORD` | `sto-centr-demo` | вход в панель заявок. **Без неё панель закрыта полностью** — на показе её не открыть |
+| `NEXT_PUBLIC_SITE_URL` | адрес деплоя, напр. `https://sto-centr.vercel.app` | абсолютные ссылки в Open Graph и sitemap (если не задать, Vercel подставит свой адрес сам) |
+| `ADMIN_SECRET` | любая случайная строка | подпись сессии панели (необязательно) |
+
+Для боевого сайта добавить: `KV_REST_API_URL` + `KV_REST_API_TOKEN` (или
+`TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID`), чтобы заявки не терялись между перезапусками.
+
 ## Что сделать перед боевым запуском
 
 1. **`ADMIN_PASSWORD`** — задать свой пароль в панели Vercel → Settings → Environment Variables.
