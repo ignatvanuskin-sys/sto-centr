@@ -1,7 +1,5 @@
 import type { MetadataRoute } from "next";
-
-/** Домен подставляется при деплое: NEXT_PUBLIC_SITE_URL=https://example.kz */
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "http://localhost:3210";
+import { siteUrl } from "@/lib/site-url";
 
 export default function robots(): MetadataRoute.Robots {
   return {

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Loader2, LogOut, MessageCircle, Phone, RefreshCw, Trash2 } from "lucide-react";
 import { company, formatPrice, primaryWhatsApp } from "@/lib/company";
+import { demoBookings } from "@/lib/demo-bookings";
 import { formatIsoHuman } from "@/lib/slots";
 import {
   BOOKING_STATUSES,
@@ -228,8 +229,12 @@ export default function AdminPanel() {
     );
   }
 
-  const visible = filter === "all" ? bookings : bookings.filter((b) => b.status === filter);
-  const newCount = bookings.filter((b) => b.status === "NEW").length;
+  /* Пока реальных заявок нет, панель показывает примеры — чтобы владелец
+     увидел интерфейс на демонстрации, а не пустой экран. */
+  const isEmpty = bookings.length === 0;
+  const shown = isEmpty ? demoBookings : bookings;
+  const visible = filter === "all" ? shown : shown.filter((b) => b.status === filter);
+  const newCount = shown.filter((b) => b.status === "NEW").length;
 
   /* ───────────────────────── список ───────────────────────── */
 
@@ -239,7 +244,7 @@ export default function AdminPanel() {
         <div>
           <h1 className="text-2xl font-extrabold tracking-[-0.02em] text-ink">Заявки с сайта</h1>
           <p className="mt-1 text-[14px] text-muted">
-            {bookings.length} всего · {newCount} новых
+            {isEmpty ? "реальных заявок пока нет" : `${bookings.length} всего · ${newCount} новых`}
             {storage ? ` · хранилище: ${storage === "file" ? "файл" : storage === "kv" ? "KV" : "в памяти"}` : ""}
           </p>
         </div>
@@ -274,9 +279,17 @@ export default function AdminPanel() {
         </p>
       ) : null}
 
+      {isEmpty ? (
+        <p className="mt-4 rounded-xl border border-line bg-white p-3.5 text-[13px] leading-relaxed text-muted">
+          <b className="text-ink">Ниже — примеры заявок</b>, чтобы показать, как выглядит панель.
+          Это не данные клиентов: как только с сайта придёт первая настоящая заявка, примеры
+          исчезнут сами. Проверить запись можно на самом сайте — кнопка «Записаться».
+        </p>
+      ) : null}
+
       <div className="mt-5 flex flex-wrap gap-2">
         {FILTERS.map((f) => {
-          const count = f.id === "all" ? bookings.length : bookings.filter((b) => b.status === f.id).length;
+          const count = f.id === "all" ? shown.length : shown.filter((b) => b.status === f.id).length;
           return (
             <button
               key={f.id}
@@ -307,7 +320,7 @@ export default function AdminPanel() {
 
       {visible.length === 0 ? (
         <p className="mt-6 rounded-2xl border border-line bg-white p-6 text-center text-[14px] text-muted">
-          {bookings.length === 0
+          {isEmpty
             ? "Заявок пока нет. Они появятся здесь сразу после отправки формы на сайте."
             : "В этом статусе заявок нет."}
         </p>
@@ -325,8 +338,8 @@ export default function AdminPanel() {
                       {STATUS_LABELS[b.status]}
                     </span>
                     {b.demo ? (
-                      <span className="rounded-full border border-line bg-white px-2.5 py-0.5 text-[12px] text-muted">
-                        проверочная
+                      <span className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-[12px] font-bold text-amber-800">
+                        пример
                       </span>
                     ) : null}
                   </div>
@@ -336,10 +349,15 @@ export default function AdminPanel() {
                 </div>
 
                 <div className="flex items-center gap-2">
+                  {/* У примеров нет действий: это витрина интерфейса, а не заявка */}
+                  {b.demo ? (
+                    <span className="text-[13px] text-muted">демонстрационный пример</span>
+                  ) : null}
                   <label className="sr-only" htmlFor={`status-${b.id}`}>
                     Статус заявки {b.code}
                   </label>
                   <select
+                    hidden={b.demo}
                     id={`status-${b.id}`}
                     value={b.status}
                     onChange={(e) => setStatus(b, e.target.value as BookingStatus)}
@@ -352,15 +370,17 @@ export default function AdminPanel() {
                       </option>
                     ))}
                   </select>
-                  <button
-                    type="button"
-                    onClick={() => remove(b)}
-                    disabled={busyId === b.id}
-                    aria-label={`Удалить заявку ${b.code}`}
-                    className="grid size-11 place-items-center rounded-xl border border-line text-muted transition-colors hover:border-red-300 hover:text-red-700"
-                  >
-                    <Trash2 className="size-4" aria-hidden="true" />
-                  </button>
+                  {b.demo ? null : (
+                    <button
+                      type="button"
+                      onClick={() => remove(b)}
+                      disabled={busyId === b.id}
+                      aria-label={`Удалить заявку ${b.code}`}
+                      className="grid size-11 place-items-center rounded-xl border border-line text-muted transition-colors hover:border-red-300 hover:text-red-700"
+                    >
+                      <Trash2 className="size-4" aria-hidden="true" />
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -376,7 +396,7 @@ export default function AdminPanel() {
                 {b.comment ? <Row label="Комментарий" value={b.comment} /> : null}
               </dl>
 
-              <div className="mt-4 flex flex-wrap gap-2">
+              <div className={b.demo ? "hidden" : "mt-4 flex flex-wrap gap-2"}>
                 <a href={`tel:${b.phone}`} className="btn btn-primary min-h-[44px] px-4 py-2.5 text-[14px]">
                   <Phone className="size-4" aria-hidden="true" />
                   Позвонить

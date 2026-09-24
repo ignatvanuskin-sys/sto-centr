@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
 import "./globals.css";
 import { company, gisLink, photos, schedule } from "@/lib/company";
+import { siteUrl as siteUrlFromEnv } from "@/lib/site-url";
 
 const manrope = Manrope({
   subsets: ["latin", "cyrillic"],
@@ -10,10 +11,10 @@ const manrope = Manrope({
 });
 
 /**
- * Домен сайта задаётся при деплое: NEXT_PUBLIC_SITE_URL=https://example.kz
- * Пока домен не задан, используется localhost (нужно для корректных OG-ссылок).
+ * Домен сайта для абсолютных ссылок. Приоритет: NEXT_PUBLIC_SITE_URL →
+ * домены Vercel (в том числе демо-деплой) → localhost. См. lib/site-url.ts.
  */
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const siteUrl = siteUrlFromEnv;
 
 const title = `${company.name} — автосервис в Кокшетау: ремонт стартеров, генераторов и ходовой`;
 const description =
