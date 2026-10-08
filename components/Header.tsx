@@ -8,6 +8,7 @@ import {
   primaryWhatsApp,
   scheduleSummary,
 } from "@/lib/company";
+import { LogoLockup } from "./Logo";
 import { useBooking } from "./booking/BookingContext";
 
 const NAV = [
@@ -66,20 +67,10 @@ export default function Header() {
         >
           <a
             href="#top"
-            className="flex min-h-[44px] min-w-0 items-center gap-3"
+            className="flex min-h-[44px] min-w-0 items-center"
             aria-label={`${company.name} — в начало страницы`}
           >
-            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand font-extrabold text-ink">
-              СЦ
-            </span>
-            <span className="min-w-0">
-              <span className="block truncate text-[15px] font-extrabold uppercase leading-tight tracking-[0.14em] text-white">
-                {company.name}
-              </span>
-              <span className="block truncate text-[10px] font-bold uppercase tracking-[0.22em] text-mist-2">
-                {company.city} · ул. Шанырак 6а/с
-              </span>
-            </span>
+            <LogoLockup subtitle={`${company.city} · ул. Шанырак 6а/с`} />
           </a>
 
           <nav aria-label="Основная навигация" className="hidden lg:block">
@@ -146,14 +137,15 @@ export default function Header() {
           inert={!menuOpen}
         >
           <div className="flex items-center justify-between gap-3">
-            <span className="text-[13px] font-extrabold uppercase tracking-[0.2em] text-mist-2">
-              Меню
-            </span>
+            {/* Знак нужен и в меню: полноэкранная панель закрывает шапку */}
+            <LogoLockup subtitle={`${company.city} · ул. Шанырак 6а/с`} />
             <button
               type="button"
               onClick={() => setMenuOpen(false)}
               aria-label="Закрыть меню"
-              className="grid size-11 place-items-center rounded-xl border border-white/15 bg-white/5 text-white"
+              /* shrink-0: без него на 320px flex сжимал кнопку до 34px и
+                 тап-таргет уходил ниже минимума 44px */
+              className="grid size-11 shrink-0 place-items-center rounded-xl border border-white/15 bg-white/5 text-white"
             >
               <X className="size-5" aria-hidden="true" />
             </button>

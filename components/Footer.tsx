@@ -1,4 +1,5 @@
 import { company, gisLink, primaryPhone, primaryWhatsApp, scheduleSummary } from "@/lib/company";
+import { LogoLockup } from "./Logo";
 
 const NAV = [
   { href: "#uslugi", label: "Услуги и цены" },
@@ -19,14 +20,7 @@ export default function Footer() {
       <div className="wrap">
         <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr_1fr] lg:gap-12">
           <div>
-            <div className="flex items-center gap-3">
-              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand font-extrabold text-ink">
-                СЦ
-              </span>
-              <span className="text-[15px] font-extrabold uppercase tracking-[0.14em] text-white">
-                {company.name}
-              </span>
-            </div>
+            <LogoLockup subtitle={company.city} />
             <p className="mt-4 max-w-sm text-[14px] leading-relaxed text-mist">
               {company.tagline}. Ремонт стартеров и генераторов, двигателей и
               ходовой части, компьютерная диагностика, развал-схождение,
