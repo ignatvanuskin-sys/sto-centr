@@ -1,129 +1,130 @@
 "use client";
 
 import { useState } from "react";
-import { CalendarPlus, ChevronDown } from "lucide-react";
-import { BookingButton } from "./booking/BookingContext";
+import { ArrowUpRight, ListFilter } from "lucide-react";
+import { allServices, formatPrice, priceUpdatedAt } from "@/lib/company";
 import {
-  allServices,
-  featuredServices,
-  formatPrice,
-  priceUpdatedAt,
-  primaryWhatsApp,
-  serviceGroups,
-} from "@/lib/company";
+  priceDisclaimer,
+  priceSourceNote,
+  serviceCards,
+} from "@/lib/content";
+import { pricedServices } from "@/lib/price-search";
+import { useBooking } from "./booking/BookingContext";
+import PriceCatalog from "./PriceCatalog";
 
-function whatsappFor(serviceName: string) {
-  const text = `Здравствуйте! Интересует услуга: ${serviceName}. Подскажите стоимость и когда можно приехать.`;
-  return `${primaryWhatsApp.href}?text=${encodeURIComponent(text)}`;
-}
-
+/**
+ * Восемь основных работ вместо стены из 93 позиций. Полный прайс — в каталоге:
+ * 93 строки на странице превращали блок услуг в справочник, который никто
+ * не читает, а форма записи всё равно подставляла услугу из поиска.
+ */
 export default function Services() {
-  const [expanded, setExpanded] = useState(false);
+  const [catalogOpen, setCatalogOpen] = useState(false);
+  const { open } = useBooking();
 
   return (
-    <section id="uslugi" className="scroll-mt-20 bg-paper py-14 sm:py-20">
+    <section
+      id="uslugi"
+      className="scroll-mt-24 border-t border-hair bg-ink py-16 sm:py-20 lg:py-28"
+    >
       <div className="wrap">
-        <p className="eyebrow text-brand-ink">Услуги и цены</p>
-        <h2 className="section-title mt-2 max-w-2xl">
-          Что делаем и сколько это стоит
-        </h2>
-        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted sm:text-base">
-          Цены — из прайс-листа сервиса в 2ГИС (обновлён {priceUpdatedAt}). Всего{" "}
-          {allServices.length} позиции: от осмотра автомобиля и мелкого ремонта
-          до капитального ремонта двигателя. Точную стоимость для вашей машины
-          уточняйте по телефону.
-        </p>
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <p className="eyebrow text-brand">
+              <span className="size-1.5 rounded-full bg-brand" aria-hidden="true" />
+              Услуги и цены
+            </p>
+            <h2 className="section-title mt-4 text-white">
+              Работы, с которыми приезжают чаще всего
+            </h2>
+            <p className="lead mt-4">
+              Всего в прайсе сервиса {allServices.length} позиции — от осмотра
+              автомобиля до капитального ремонта двигателя. Ниже восемь основных
+              работ; остальное можно найти в полном прайсе.
+            </p>
+          </div>
 
-        <ul className="mt-8 grid gap-3 xs:grid-cols-2 lg:grid-cols-4">
-          {featuredServices.map((service) => (
-            <li
-              key={service.name}
-              className="card flex flex-col p-4 transition-shadow hover:shadow-[0_10px_30px_-18px_rgba(12,15,19,0.45)]"
-            >
-              <h3 className="text-[15px] font-bold leading-snug">
-                {service.name}
-              </h3>
-              <p className="mt-2 text-xl font-extrabold tracking-tight">
-                {formatPrice(service.price)}
-              </p>
-              <div className="mt-4 flex flex-col gap-2">
-                <BookingButton
-                  service={service.name}
-                  className="btn btn-primary w-full px-3 py-2.5 text-sm"
-                >
-                  <CalendarPlus className="size-4" aria-hidden="true" />
-                  Записаться
-                </BookingButton>
-                <a
-                  href={whatsappFor(service.name)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  /* min-h-11: ссылка была высотой 18px — мимо неё легко промахнуться */
-                  className="inline-flex min-h-[44px] items-center justify-center text-[12px] font-semibold text-muted underline decoration-line underline-offset-4 transition-colors hover:text-ink"
-                >
-                  Уточнить в WhatsApp
-                </a>
-              </div>
-            </li>
-          ))}
-        </ul>
-
-        <div className="mt-6">
           <button
             type="button"
-            onClick={() => setExpanded((value) => !value)}
-            aria-expanded={expanded}
-            aria-controls="full-price"
-            className="btn btn-dark w-full xs:w-auto"
+            onClick={() => setCatalogOpen(true)}
+            className="btn btn-outline-light w-full shrink-0 px-5 sm:w-auto"
           >
-            {expanded
-              ? "Свернуть прайс"
-              : `Показать весь прайс (${allServices.length})`}
-            <ChevronDown
-              className={`size-4 transition-transform ${expanded ? "rotate-180" : ""}`}
-              aria-hidden="true"
-            />
+            <ListFilter className="size-4" aria-hidden="true" />
+            Посмотреть весь прайс ({allServices.length})
           </button>
         </div>
 
-        {expanded && (
-          <div id="full-price" className="mt-8 grid gap-4 lg:grid-cols-2">
-            {serviceGroups.map((group) => (
-              <div key={group.title} className="card p-5">
-                <h3 className="text-base font-extrabold tracking-tight">
-                  {group.title}
-                  <span className="ml-2 text-sm font-semibold text-muted">
-                    {group.items.length} позиций
-                  </span>
-                </h3>
-                <ul className="mt-3">
-                  {group.items.map((item) => (
-                    <li key={item.name} className="price-row">
-                      <span className="text-[15px] leading-snug text-ink">
-                        {item.name}
-                      </span>
-                      <span className="shrink-0 text-[15px] font-bold tabular-nums">
-                        {item.price === null ? "—" : formatPrice(item.price)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-            <p className="text-sm text-muted lg:col-span-2">
-              Прайс-лист обновлён {priceUpdatedAt}. Итоговая стоимость зависит от
-              автомобиля и объёма работ — уточняйте по телефону{" "}
-              <a
-                href="tel:+77162293535"
-                className="font-semibold text-ink underline decoration-brand decoration-2 underline-offset-4"
+        <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:mt-12 lg:grid-cols-4">
+          {serviceCards.map((card, index) => {
+            const service = pricedServices.find((item) => item.name === card.name);
+            return (
+              <li
+                key={card.name}
+                className="card-steel card-steel-hover group relative flex flex-col p-5"
               >
-                +7 (7162) 29-35-35
-              </a>
-              .
-            </p>
-          </div>
-        )}
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-[13px] font-extrabold tracking-[0.2em] text-brand">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className="max-w-[60%] text-right text-[10px] font-bold uppercase leading-tight tracking-[0.12em] text-mist-2">
+                    {service?.group}
+                  </span>
+                </div>
+
+                <h3 className="mt-4 text-[17px] font-bold leading-snug text-white">
+                  {card.name}
+                </h3>
+                <p className="mt-2.5 flex-1 text-[14px] leading-relaxed text-mist">
+                  {card.blurb}
+                </p>
+
+                <div className="mt-5 flex items-end justify-between gap-3 border-t border-hair pt-4">
+                  <span className="min-w-0">
+                    <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-mist-2">
+                      {service?.price === null ? "Цена" : "Цена из прайса"}
+                    </span>
+                    <span className="mt-1 block text-[17px] font-extrabold leading-tight text-white">
+                      {formatPrice(service?.price ?? null)}
+                    </span>
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={() => open({ service: card.name })}
+                    aria-label={`Записаться: ${card.name}`}
+                    className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl border border-hair px-3.5 text-[13px] font-bold text-white transition-colors hover:border-brand hover:text-brand"
+                  >
+                    Записаться
+                    <ArrowUpRight
+                      className="size-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      aria-hidden="true"
+                    />
+                  </button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+
+        <div className="mt-8 flex flex-col gap-3 rounded-2xl border border-hair bg-steel p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <p className="text-[13px] leading-relaxed text-mist">
+            <span className="font-bold text-white">{priceDisclaimer}</span>{" "}
+            {priceSourceNote}
+          </p>
+          <button
+            type="button"
+            onClick={() => setCatalogOpen(true)}
+            className="btn btn-outline-light w-full shrink-0 sm:w-auto"
+          >
+            Каталог цен
+            <ArrowUpRight className="size-4" aria-hidden="true" />
+          </button>
+        </div>
       </div>
+
+      <PriceCatalog open={catalogOpen} onClose={() => setCatalogOpen(false)} />
+      <p className="sr-only">
+        Прайс-лист обновлён {priceUpdatedAt}. Цены указаны в тенге.
+      </p>
     </section>
   );
 }

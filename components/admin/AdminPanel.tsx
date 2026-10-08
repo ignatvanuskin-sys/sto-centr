@@ -387,7 +387,17 @@ export default function AdminPanel() {
               <dl className="mt-4 grid gap-x-6 gap-y-2 sm:grid-cols-2">
                 <Row label="Клиент" value={`${b.name} · ${b.phone}`} />
                 <Row label="Связь" value={`${b.channel}${b.telegram ? ` (@${b.telegram})` : ""}`} />
-                <Row label="Авто" value={`${b.vehicleModel}, ${b.vehicleYear}${b.vin ? ` · VIN ${b.vin}` : ""}`} />
+                <Row
+                  label="Авто"
+                  value={
+                    [
+                      [b.vehicleModel, b.vehicleYear].filter(Boolean).join(", "),
+                      b.vin ? `VIN ${b.vin}` : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" · ") || "не указано"
+                  }
+                />
                 <Row label="Визит" value={`${formatIsoHuman(b.date)}, ${b.time}`} />
                 <Row
                   label="Услуга"

@@ -1,5 +1,11 @@
-import { CalendarPlus, Clock, CreditCard, MapPin, MessageCircle, Navigation, Phone } from "lucide-react";
-import { BookingButton } from "./booking/BookingContext";
+import {
+  Clock,
+  CreditCard,
+  MapPin,
+  MessageCircle,
+  Navigation,
+  Phone,
+} from "lucide-react";
 import {
   company,
   gisLink,
@@ -9,117 +15,43 @@ import {
   schedule,
   scheduleLabel,
 } from "@/lib/company";
+import OpenStatus from "./OpenStatus";
+
+/**
+ * Финальный блок: адрес, телефоны, WhatsApp, график и карта с маршрутом.
+ * Координаты и ссылки — реальные, из карточки 2ГИС.
+ */
 
 const mapSrc =
   "https://www.openstreetmap.org/export/embed.html?bbox=69.40000%2C53.28600%2C69.43000%2C53.29800&layer=mapnik&marker=53.291885%2C69.414982";
 
 export default function Contacts() {
   return (
-    <section id="kontakty" className="scroll-mt-20 bg-ink py-14 text-white sm:py-20">
+    <section
+      id="kontakty"
+      className="scroll-mt-24 border-t border-hair bg-ink-2 py-16 sm:py-20 lg:py-28"
+    >
       <div className="wrap">
-        <p className="eyebrow text-brand">Контакты</p>
-        <h2 className="section-title mt-2">Как нас найти</h2>
+        <div className="max-w-3xl">
+          <p className="eyebrow text-brand">
+            <span className="size-1.5 rounded-full bg-brand" aria-hidden="true" />
+            Контакты
+          </p>
+          <h2 className="section-title mt-4 text-white">
+            {company.name}, {company.address.city}
+          </h2>
+          <p className="mt-4 text-[17px] font-semibold text-mist sm:text-xl">
+            {company.address.street} · {company.building.toLowerCase()}
+          </p>
+          <p className="mt-4">
+            <OpenStatus className="text-[14px] font-semibold text-white" />
+          </p>
+        </div>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-2 lg:gap-12">
+        <div className="mt-10 grid gap-8 lg:mt-14 lg:grid-cols-[0.95fr_1.05fr] lg:gap-12">
           <div className="min-w-0">
-            <ul className="space-y-6">
-              <li className="flex gap-4">
-                <MapPin className="mt-0.5 size-5 shrink-0 text-brand" aria-hidden="true" />
-                <div>
-                  <p className="font-bold">{company.address.street}</p>
-                  <p className="text-sm text-white/65">
-                    {company.address.city}, {company.address.postalCode}
-                  </p>
-                  <p className="mt-1 text-sm text-white/65">{company.building}</p>
-                  <a
-                    href={gisLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 inline-flex min-h-[44px] items-center text-sm font-semibold text-brand underline decoration-brand/40 underline-offset-4 hover:decoration-brand"
-                  >
-                    Открыть в 2ГИС
-                  </a>
-                </div>
-              </li>
-
-              <li className="flex gap-4">
-                <Phone className="mt-0.5 size-5 shrink-0 text-brand" aria-hidden="true" />
-                <div>
-                  <p className="font-bold">Телефоны</p>
-                  <ul className="mt-1 space-y-1">
-                    {company.phones.map((phone) => (
-                      <li key={phone.href}>
-                        <a
-                          href={phone.href}
-                          /* 44px по высоте: по этим ссылкам звонят пальцем */
-                          className="inline-flex min-h-[44px] items-center text-sm text-white/75 transition-colors hover:text-white"
-                        >
-                          {phone.label}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </li>
-
-              <li className="flex gap-4">
-                <MessageCircle className="mt-0.5 size-5 shrink-0 text-brand" aria-hidden="true" />
-                <div>
-                  <p className="font-bold">WhatsApp</p>
-                  <ul className="mt-1 space-y-1">
-                    {company.whatsapp.map((item) => (
-                      <li key={item.href}>
-                        <a
-                          href={item.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex min-h-[44px] items-center text-sm text-white/75 transition-colors hover:text-white"
-                        >
-                          {item.label}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </li>
-
-              <li className="flex gap-4">
-                <Clock className="mt-0.5 size-5 shrink-0 text-brand" aria-hidden="true" />
-                <div>
-                  <p className="font-bold">График работы</p>
-                  <ul className="mt-2 max-w-xs">
-                    {schedule.map((item) => (
-                      <li
-                        key={item.short}
-                        className="flex items-baseline justify-between gap-4 border-b border-white/10 py-1.5 text-sm last:border-0"
-                      >
-                        <span className="text-white/65">{item.short}</span>
-                        <span className="font-semibold tabular-nums">
-                          {scheduleLabel(item)}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </li>
-
-              <li className="flex gap-4">
-                <CreditCard className="mt-0.5 size-5 shrink-0 text-brand" aria-hidden="true" />
-                <div>
-                  <p className="font-bold">Оплата</p>
-                  <p className="text-sm text-white/65">
-                    {company.payment.join(" · ")}
-                  </p>
-                </div>
-              </li>
-            </ul>
-
-            <div className="mt-8 flex flex-col gap-3 xs:flex-row xs:flex-wrap">
-              <BookingButton className="btn btn-primary w-full xs:w-auto">
-                <CalendarPlus className="size-4" aria-hidden="true" />
-                Записаться на сервис
-              </BookingButton>
-              <a href={primaryPhone.href} className="btn btn-outline-light w-full xs:w-auto">
+            <div className="flex flex-col gap-3 xs:flex-row xs:flex-wrap">
+              <a href={primaryPhone.href} className="btn btn-brand w-full px-6 xs:w-auto">
                 <Phone className="size-4" aria-hidden="true" />
                 Позвонить
               </a>
@@ -127,30 +59,153 @@ export default function Contacts() {
                 href={primaryWhatsApp.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-outline-light w-full xs:w-auto"
+                className="btn btn-outline-light w-full px-6 xs:w-auto"
               >
                 <MessageCircle className="size-4" aria-hidden="true" />
-                Написать
+                WhatsApp
+              </a>
+              <a
+                href={routeLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-outline-light w-full px-6 xs:w-auto"
+              >
+                <Navigation className="size-4" aria-hidden="true" />
+                Построить маршрут
               </a>
             </div>
+
+            <dl className="mt-8 flex flex-col">
+              <div className="flex gap-4 border-b border-hair py-5">
+                <MapPin className="mt-0.5 size-5 shrink-0 text-brand" aria-hidden="true" />
+                <div className="min-w-0">
+                  <dt className="text-[10px] font-bold uppercase tracking-[0.16em] text-mist-2">
+                    Адрес
+                  </dt>
+                  <dd className="mt-1 text-[15px] font-semibold text-white">
+                    {company.address.street}, {company.address.city},{" "}
+                    {company.address.postalCode}
+                  </dd>
+                  <dd className="mt-2 flex flex-wrap items-center gap-3">
+                    <a
+                      href={gisLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex min-h-[44px] items-center text-[13px] font-bold text-brand underline decoration-brand/40 underline-offset-4 transition-colors hover:decoration-brand"
+                    >
+                      Открыть в 2ГИС
+                    </a>
+                    <span className="text-[12px] tabular-nums text-mist-2">
+                      {company.geo.lat}, {company.geo.lon}
+                    </span>
+                  </dd>
+                </div>
+              </div>
+
+              <div className="flex gap-4 border-b border-hair py-5">
+                <Phone className="mt-0.5 size-5 shrink-0 text-brand" aria-hidden="true" />
+                <div className="min-w-0">
+                  <dt className="text-[10px] font-bold uppercase tracking-[0.16em] text-mist-2">
+                    Телефоны
+                  </dt>
+                  <dd className="mt-1 flex flex-col">
+                    {company.phones.map((phone) => (
+                      <a
+                        key={phone.href}
+                        href={phone.href}
+                        className="inline-flex min-h-[44px] items-center text-[15px] font-semibold text-white transition-colors hover:text-brand"
+                      >
+                        {phone.label}
+                      </a>
+                    ))}
+                  </dd>
+                </div>
+              </div>
+
+              <div className="flex gap-4 border-b border-hair py-5">
+                <MessageCircle
+                  className="mt-0.5 size-5 shrink-0 text-brand"
+                  aria-hidden="true"
+                />
+                <div className="min-w-0">
+                  <dt className="text-[10px] font-bold uppercase tracking-[0.16em] text-mist-2">
+                    WhatsApp
+                  </dt>
+                  <dd className="mt-1 flex flex-col">
+                    {company.whatsapp.map((item) => (
+                      <a
+                        key={item.href}
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex min-h-[44px] items-center text-[15px] font-semibold text-white transition-colors hover:text-brand"
+                      >
+                        {item.label}
+                      </a>
+                    ))}
+                  </dd>
+                </div>
+              </div>
+
+              <div className="flex gap-4 border-b border-hair py-5">
+                <Clock className="mt-0.5 size-5 shrink-0 text-brand" aria-hidden="true" />
+                <div className="min-w-0 flex-1">
+                  <dt className="text-[10px] font-bold uppercase tracking-[0.16em] text-mist-2">
+                    График работы
+                  </dt>
+                  <dd className="mt-2 max-w-sm">
+                    <ul>
+                      {schedule.map((item) => (
+                        <li
+                          key={item.short}
+                          className="flex items-baseline justify-between gap-4 border-b border-hair py-1.5 text-[14px] last:border-0"
+                        >
+                          <span className="text-mist">{item.short}</span>
+                          <span className="font-semibold tabular-nums text-white">
+                            {scheduleLabel(item)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              </div>
+
+              <div className="flex gap-4 py-5">
+                <CreditCard className="mt-0.5 size-5 shrink-0 text-brand" aria-hidden="true" />
+                <div className="min-w-0">
+                  <dt className="text-[10px] font-bold uppercase tracking-[0.16em] text-mist-2">
+                    Оплата
+                  </dt>
+                  <dd className="mt-1 text-[15px] font-semibold text-white">
+                    {company.payment.join(" · ")}
+                  </dd>
+                </div>
+              </div>
+            </dl>
           </div>
 
           <div className="flex min-w-0 flex-col gap-4">
-            <div className="w-full overflow-hidden rounded-2xl border border-white/12 bg-ink-2">
+            <div className="overflow-hidden rounded-3xl border border-hair bg-steel">
               <iframe
                 title={`Карта: ${company.name}, ${company.address.street}, ${company.address.city}`}
                 src={mapSrc}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                className="block h-64 w-full border-0 sm:h-80 lg:h-[22rem]"
+                className="block h-72 w-full border-0 sm:h-96 lg:h-[26rem]"
               />
             </div>
+            <p className="text-[12px] leading-relaxed text-mist-2">
+              Карта показывает координаты из карточки 2ГИС. Точное расположение
+              ворот и въезда на территорию удобнее смотреть в 2ГИС — там есть
+              фотографии двора.
+            </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
                 href={routeLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-primary w-full sm:flex-1"
+                className="btn btn-brand w-full sm:flex-1"
               >
                 <Navigation className="size-4" aria-hidden="true" />
                 Построить маршрут

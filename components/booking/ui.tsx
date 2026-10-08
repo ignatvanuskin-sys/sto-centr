@@ -18,11 +18,11 @@ export function Field({
   return (
     <label className="block">
       <span className="flex items-baseline justify-between gap-2">
-        <span className="text-[13px] font-bold uppercase tracking-[0.08em] text-ink">
+        <span className="text-[12px] font-bold uppercase tracking-[0.12em] text-white">
           {label}
-          {required ? <span className="text-brand-ink"> *</span> : null}
+          {required ? <span className="text-brand"> *</span> : null}
         </span>
-        {hint ? <span className="text-[12px] text-muted">{hint}</span> : null}
+        {hint ? <span className="text-[12px] text-mist-2">{hint}</span> : null}
       </span>
       <span className="mt-2 block">{children}</span>
     </label>
@@ -32,19 +32,30 @@ export function Field({
 /** role="alert" — скринридер сообщает об ошибке сразу после попытки отправки */
 export function ErrorText({ children }: { children: ReactNode }) {
   return (
-    <p role="alert" className="mt-2 text-[13px] font-semibold text-red-700">
+    <p role="alert" className="mt-2 text-[13px] font-semibold text-red-400">
       {children}
     </p>
   );
 }
 
-export function StepTitle({ title, text }: { title: string; text: string }) {
+export function StepTitle({
+  step,
+  title,
+  text,
+}: {
+  step: number;
+  title: string;
+  text: string;
+}) {
   return (
-    <header className="mb-5">
-      <h3 className="text-[19px] font-extrabold leading-tight tracking-[-0.01em] text-ink sm:text-xl">
+    <header className="mb-6">
+      <p className="text-[12px] font-extrabold tracking-[0.2em] text-brand">
+        {String(step).padStart(2, "0")}
+      </p>
+      <h3 className="mt-2 text-[22px] font-extrabold leading-tight tracking-[-0.01em] text-white sm:text-[26px]">
         {title}
       </h3>
-      <p className="mt-1.5 text-[14px] leading-relaxed text-muted">{text}</p>
+      <p className="mt-2 text-[14px] leading-relaxed text-mist">{text}</p>
     </header>
   );
 }
@@ -69,8 +80,8 @@ export function ChoiceButton({
       className={[
         "w-full border text-left transition-colors",
         selected
-          ? "border-brand bg-brand-soft text-ink"
-          : "border-line bg-white text-ink hover:border-ink/30",
+          ? "border-brand bg-brand/12 text-white"
+          : "border-hair bg-white/[0.03] text-white hover:border-white/25 hover:bg-white/[0.06]",
         className,
       ].join(" ")}
     >
@@ -81,11 +92,11 @@ export function ChoiceButton({
 
 export function SummaryRow({ label, value }: { label: string; value: ReactNode }) {
   return (
-    <div className="flex items-baseline justify-between gap-3 border-b border-dashed border-line py-2 last:border-b-0">
-      <span className="shrink-0 text-[12px] font-bold uppercase tracking-[0.08em] text-muted">
+    <div className="flex items-baseline justify-between gap-3 border-b border-hair py-2.5 last:border-b-0">
+      <span className="shrink-0 text-[11px] font-bold uppercase tracking-[0.12em] text-mist-2">
         {label}
       </span>
-      <span className="text-right text-[14px] font-semibold text-ink">{value}</span>
+      <span className="text-right text-[14px] font-semibold text-white">{value}</span>
     </div>
   );
 }

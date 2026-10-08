@@ -10,7 +10,6 @@ import {
   formatIsoHuman,
   isDateBookable,
   monthMatrix,
-  quickDates,
   shopNow,
   weekdayIndex,
 } from "@/lib/slots";
@@ -18,6 +17,8 @@ import {
 /**
  * Календарь записи, который знает реальный график сервиса из 2ГИС:
  * воскресенья и прошедшие дни недоступны, вперёд — 60 дней.
+ * Быстрые варианты даты («Сегодня / Завтра») живут на шаге формы:
+ * так календарь раскрывается только тем, кому нужна конкретная дата.
  */
 
 export default function Calendar({
@@ -28,7 +29,6 @@ export default function Calendar({
   onChange: (iso: string) => void;
 }) {
   const now = useMemo(() => shopNow(), []);
-  const quick = useMemo(() => quickDates(now), [now]);
 
   const [cursor, setCursor] = useState(() => {
     const base = value || now.iso;
@@ -60,46 +60,19 @@ export default function Calendar({
 
   return (
     <div>
-      {/* Быстрые варианты: сегодня / завтра / через 3 дня */}
-      <div className="mb-4 flex flex-wrap gap-2">
-        {quick.map((q) => {
-          const selected = value === q.iso;
-          return (
-            <button
-              key={q.label}
-              type="button"
-              disabled={!q.available}
-              aria-pressed={selected}
-              onClick={() => onChange(q.iso)}
-              className={[
-                "min-h-[44px] rounded-xl border px-3.5 text-[13px] font-bold transition-colors",
-                selected
-                  ? "border-brand bg-brand-soft text-ink"
-                  : q.available
-                    ? "border-line bg-white text-ink hover:border-ink/30"
-                    : "cursor-not-allowed border-line bg-white text-muted/50",
-              ].join(" ")}
-              title={q.available ? undefined : "В этот день записи нет"}
-            >
-              {q.label}
-            </button>
-          );
-        })}
-      </div>
-
       {/* На 320px календарю не хватает ширины: уменьшаем внутренние отступы */}
-      <div className="rounded-2xl border border-line bg-white p-2 xs:p-3 sm:p-4">
+      <div className="rounded-2xl border border-hair bg-white/[0.03] p-2 xs:p-3 sm:p-4">
         <div className="mb-3 flex items-center justify-between gap-2">
           <button
             type="button"
             onClick={() => shiftMonth(-1)}
             disabled={!canGoBack}
             aria-label="Предыдущий месяц"
-            className="grid size-11 place-items-center rounded-xl border border-line text-ink transition-colors hover:border-ink/40 disabled:cursor-not-allowed disabled:opacity-40"
+            className="grid size-11 place-items-center rounded-xl border border-hair text-white transition-colors hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ChevronLeft className="size-5" aria-hidden="true" />
           </button>
-          <p className="text-[15px] font-extrabold text-ink">
+          <p className="text-[15px] font-extrabold text-white">
             {MONTHS_NOMINATIVE[cursor.month]} {cursor.year}
           </p>
           <button
@@ -107,7 +80,7 @@ export default function Calendar({
             onClick={() => shiftMonth(1)}
             disabled={!canGoForward}
             aria-label="Следующий месяц"
-            className="grid size-11 place-items-center rounded-xl border border-line text-ink transition-colors hover:border-ink/40 disabled:cursor-not-allowed disabled:opacity-40"
+            className="grid size-11 place-items-center rounded-xl border border-hair text-white transition-colors hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ChevronRight className="size-5" aria-hidden="true" />
           </button>
@@ -117,7 +90,7 @@ export default function Calendar({
           {WEEKDAYS_SHORT.map((day) => (
             <span
               key={day}
-              className="py-1 text-center text-[12px] font-bold uppercase tracking-[0.06em] text-muted"
+              className="py-1 text-center text-[11px] font-bold uppercase tracking-[0.06em] text-mist-2"
             >
               {day}
             </span>
@@ -149,11 +122,11 @@ export default function Calendar({
                   selected
                     ? "bg-brand text-ink"
                     : available
-                      ? "text-ink hover:bg-brand-soft"
+                      ? "text-white hover:bg-white/8"
                       : isSunday
-                        ? "cursor-not-allowed text-muted/40"
-                        : "cursor-not-allowed text-muted/50",
-                  isToday && !selected ? "ring-1 ring-inset ring-ink/25" : "",
+                        ? "cursor-not-allowed text-mist-2/40"
+                        : "cursor-not-allowed text-mist-2/50",
+                  isToday && !selected ? "ring-1 ring-inset ring-white/25" : "",
                 ].join(" ")}
               >
                 {Number(iso.slice(8))}
@@ -163,17 +136,17 @@ export default function Calendar({
         </div>
       </div>
 
-      <p className="mt-3 text-[13px] leading-relaxed text-muted">
+      <p className="mt-3 text-[13px] leading-relaxed text-mist">
         {value ? (
           <>
-            Выбрано: <span className="font-bold text-ink">{formatIsoHuman(value)}</span>
+            Выбрано: <span className="font-bold text-white">{formatIsoHuman(value)}</span>
             {firstFreeSlot(value, now) ? `, ближайшее время — ${firstFreeSlot(value, now)}.` : "."}
           </>
         ) : (
           "Выберите день визита."
         )}
       </p>
-      <p className="mt-1 text-[12px] leading-relaxed text-muted">
+      <p className="mt-1 text-[12px] leading-relaxed text-mist-2">
         График сервиса: {schedule.map((s) => `${s.short} ${scheduleLabel(s)}`).join(", ")}. Запись
         открыта на 60 дней вперёд.
       </p>

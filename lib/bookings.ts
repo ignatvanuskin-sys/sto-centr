@@ -173,12 +173,21 @@ function makeCode(existing: Booking[], date: string): string {
 /* ───────────────────── уведомление в Telegram ───────────────────── */
 
 export function telegramMessage(b: Booking): string {
+  /* Автомобиль в упрощённой записи не обязателен — если клиент его не указал,
+     строку не показываем совсем */
+  const vehicle = [
+    [b.vehicleModel, b.vehicleYear].filter(Boolean).join(", "),
+    b.vin ? `VIN ${b.vin}` : "",
+  ]
+    .filter(Boolean)
+    .join(", ");
+
   return [
     "🔧 Новая заявка с сайта — СТО Центр",
     `№ ${b.code}`,
     "",
     `Услуга: ${b.service}${b.price ? ` (по прайсу ${b.price.toLocaleString("ru-RU")} ₸)` : ""}`,
-    `Авто: ${b.vehicleModel}, ${b.vehicleYear}${b.vin ? `, VIN ${b.vin}` : ""}`,
+    vehicle ? `Авто: ${vehicle}` : "",
     `Визит: ${b.date} в ${b.time}`,
     "",
     `Клиент: ${b.name}`,

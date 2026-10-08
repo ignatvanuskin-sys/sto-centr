@@ -4,17 +4,30 @@
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
-  /* Палитра: графит (металл/мастерская) + оранжевый акцент */
-  --color-ink: #0c0f13;
-  --color-ink-2: #151a21;
-  --color-paper: #f5f6f8;
+  /* ───────── тёмная палитра мастерской (основная тема сайта) ─────────
+     Почти чёрный фон, стальные подложки, один акцент — тёплый оранжевый.
+     Все пары «текст на фоне» проверены по контрасту (см. scripts/contrast.js):
+     white/#08090c — 19:1, mist/#161a21 — 7,7:1, brand-ink/#ffffff — 4,9:1. */
+  --color-ink: #08090c;
+  --color-ink-2: #0e1015;
+  --color-steel: #141821;
+  --color-steel-2: #1c212b;
+  --color-hair: #262c38;
+  --color-mist: #a6b0be;
+  --color-mist-2: #7c8695;
+
+  /* ───────── светлые токены ─────────
+     Нужны панели заявок (/admin) и полям форм: она остаётся светлой. */
+  --color-paper: #f4f5f7;
   --color-line: #e3e6ea;
   --color-muted: #58616f;
-  --color-brand: #f97316;
-  --color-brand-2: #ea6a0a;
-  --color-brand-soft: #fff3e8;
-  /* Оранжевый для ТЕКСТА на светлом фоне: #ea6a0a даёт 2,96–3,20:1
-     (ниже порога 4,5 для мелкого текста), этот оттенок — 4,8–5,2:1.
+
+  /* Акцент сервиса */
+  --color-brand: #ff6a1a;
+  --color-brand-2: #ff8340;
+  --color-brand-soft: #fff2e8;
+  /* Оранжевый для ТЕКСТА на светлом фоне: #ff6a1a даёт ~2,8:1
+     (ниже порога 4,5 для мелкого текста), этот оттенок — 4,9:1.
      Яркий брендовый оранжевый остаётся на тёмных секциях и заливках. */
   --color-brand-ink: #c2410c;
 
@@ -26,11 +39,12 @@
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
     overflow-x: clip;
+    background-color: var(--color-ink);
   }
 
   body {
-    background-color: #fff;
-    color: var(--color-ink);
+    background-color: var(--color-ink);
+    color: #fff;
     overflow-x: clip;
     font-synthesis-weight: none;
   }
@@ -43,6 +57,14 @@
   :focus-visible {
     outline: 2px solid var(--color-brand);
     outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Заголовки крупные и плотные — автомобильная типографика */
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -61,7 +83,7 @@
 @layer components {
   .wrap {
     width: 100%;
-    max-width: 72rem;
+    max-width: 80rem;
     margin-inline: auto;
     padding-inline: 1rem;
   }
@@ -72,6 +94,13 @@
     }
   }
 
+  @media (min-width: 1024px) {
+    .wrap {
+      padding-inline: 2rem;
+    }
+  }
+
+  /* ───────── кнопки ───────── */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -84,14 +113,13 @@
     font-size: 1rem;
     text-align: center;
     /* Все кнопки сайта — не ниже 44px по высоте: на телефоне это минимум
-       для уверенного попадания пальцем (нижняя панель, «Уточнить цену»,
-       «Связаться», кнопки в контактах давали 40–42px). */
+       для уверенного попадания пальцем. */
     min-height: 2.75rem;
     transition:
-      background-color 0.15s ease,
-      color 0.15s ease,
-      border-color 0.15s ease,
-      transform 0.15s ease;
+      background-color 0.18s ease,
+      color 0.18s ease,
+      border-color 0.18s ease,
+      transform 0.18s ease;
     white-space: nowrap;
   }
 
@@ -99,15 +127,40 @@
     transform: translateY(1px);
   }
 
+  /* На самых узких экранах (320–335px) длинная надпись «Записаться на
+     обслуживание» шире доступной кнопке ширины: разрешаем перенос строки,
+     иначе кнопка растягивала колонку и текст уезжал за экран. */
+  @media (max-width: 21rem) {
+    .btn {
+      white-space: normal;
+    }
+  }
+
+  /* Основная кнопка сайта: заливка акцентом, текст почти чёрный */
+  .btn-brand,
   .btn-primary {
     background-color: var(--color-brand);
     color: var(--color-ink);
   }
 
+  .btn-brand:hover,
   .btn-primary:hover {
     background-color: var(--color-brand-2);
   }
 
+  /* На тёмных секциях: прозрачная с белой рамкой */
+  .btn-outline-light {
+    background-color: rgb(255 255 255 / 0.06);
+    color: #fff;
+    border: 1px solid rgb(255 255 255 / 0.22);
+  }
+
+  .btn-outline-light:hover {
+    background-color: rgb(255 255 255 / 0.14);
+    border-color: rgb(255 255 255 / 0.4);
+  }
+
+  /* На светлых поверхностях (панель заявок, форма) */
   .btn-dark {
     background-color: var(--color-ink);
     color: #fff;
@@ -127,34 +180,94 @@
     border-color: var(--color-ink);
   }
 
-  .btn-outline-light {
-    background-color: rgb(255 255 255 / 0.06);
-    color: #fff;
-    border: 1px solid rgb(255 255 255 / 0.22);
-  }
-
-  .btn-outline-light:hover {
-    background-color: rgb(255 255 255 / 0.12);
-  }
-
+  /* ───────── поверхности ───────── */
   .card {
     background-color: #fff;
     border: 1px solid var(--color-line);
     border-radius: 1rem;
   }
 
-  .section-title {
-    font-size: clamp(1.5rem, 5vw, 2.25rem);
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 1.12;
+  /* Стальная карточка на тёмном фоне */
+  .card-steel {
+    background-color: var(--color-steel);
+    border: 1px solid var(--color-hair);
+    border-radius: 1.25rem;
   }
 
+  .card-steel-hover {
+    transition:
+      transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 0.28s ease,
+      border-color 0.28s ease;
+  }
+
+  .card-steel-hover:hover {
+    transform: translateY(-4px);
+    background-color: var(--color-steel-2);
+    border-color: rgb(255 106 26 / 0.45);
+  }
+
+  /* ───────── типографика блоков ───────── */
   .eyebrow {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
+  }
+
+  @media (min-width: 640px) {
+    .eyebrow {
+      font-size: 0.75rem;
+    }
+  }
+
+  /* H2 секций */
+  .section-title {
+    font-size: clamp(1.75rem, 6vw, 3.25rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.06;
+  }
+
+  .h1-hero {
+    font-size: clamp(2.125rem, 8vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.02;
+  }
+
+  .lead {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--color-mist);
+  }
+
+  @media (min-width: 640px) {
+    .lead {
+      font-size: 1.125rem;
+    }
+  }
+
+  /* Служебные подписи «01 / 02» и метрики */
+  .stat-number {
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  /* Тонкая линия-разделитель */
+  .hair-line {
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      var(--color-hair),
+      transparent
+    );
   }
 
   /* Раскрывающийся список прайса: длинные строки с ценой справа */
@@ -164,7 +277,7 @@
     justify-content: space-between;
     gap: 1rem;
     padding: 0.625rem 0;
-    border-bottom: 1px dashed var(--color-line);
+    border-bottom: 1px dashed var(--color-hair);
   }
 
   .price-row:last-child {
@@ -176,7 +289,17 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Поля формы записи */
+  /* Скрыть полосу прокрутки у горизонтальных лент на телефоне */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* ───────── поля формы ───────── */
   .field {
     display: block;
     width: 100%;
@@ -201,7 +324,7 @@
 
   .field:focus {
     border-color: var(--color-brand);
-    box-shadow: 0 0 0 3px rgb(249 115 22 / 0.18);
+    box-shadow: 0 0 0 3px rgb(255 106 26 / 0.22);
   }
 
   .field[aria-invalid="true"] {
@@ -227,4 +350,121 @@
       6px 6px;
     background-repeat: no-repeat;
   }
+
+  /* Поле внутри тёмной формы записи */
+  .field-dark {
+    border-color: rgb(255 255 255 / 0.14);
+    background-color: rgb(255 255 255 / 0.04);
+    color: #fff;
+    min-height: 3rem;
+  }
+
+  .field-dark::placeholder {
+    color: rgb(255 255 255 / 0.4);
+  }
+
+  .field-dark:focus {
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 3px rgb(255 106 26 / 0.25);
+  }
+}
+
+/* ─────────────────────────── анимации ───────────────────────────
+   Правила вне @layer: внутри слоя они проигрывали бы utility-классам
+   Tailwind, в том числе media-запросам с другим `animation`. */
+
+@keyframes sto-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sto-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sto-sheet-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sto-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes sto-zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Появление шага формы записи */
+.anim-step {
+  animation: sto-fade-up 0.28s ease-out both;
+}
+
+/* Затемнение под модалкой */
+.anim-backdrop {
+  animation: sto-backdrop-in 0.25s ease-out both;
+}
+
+/* На телефоне панель выезжает снизу, на десктопе всплывает по центру */
+.anim-panel {
+  animation: sto-sheet-up 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (min-width: 640px) {
+  .anim-panel {
+    animation: sto-pop-in 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+/* Лайтбокс галереи */
+.anim-zoom {
+  animation: sto-zoom-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Плавное раскрытие свёрнутых блоков (календарь, «Автомобиль и детали»):
+   анимируется высота строки grid, содержимое обрезается. */
+.collapse-grid {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.collapse-grid[data-open="true"] {
+  grid-template-rows: 1fr;
+}
+
+.collapse-grid > * {
+  overflow: hidden;
+  min-height: 0;
 }

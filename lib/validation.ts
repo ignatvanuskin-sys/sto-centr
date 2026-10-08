@@ -89,8 +89,17 @@ export const YEAR_OPTIONS: string[] = Array.from(
 
 export const VEHICLE_BRANDS: readonly string[] = company.brands;
 
-/** Поля одного шага — чтобы форма могла проверять шаг отдельно */
+/**
+ * Поля одного шага — чтобы форма могла проверять шаг отдельно.
+ *
+ * Пять шагов — один вопрос на экран:
+ * 0 — что нужно сделать, 1 — автомобиль (не обязательно), 2 — когда,
+ * 3 — контакты, 4 — подтверждение (проверять нечего, там сводка и отправка).
+ */
 export type StepIndex = 0 | 1 | 2 | 3 | 4;
+
+/** Сколько шагов в форме записи (используется в прогрессе и подписях). */
+export const TOTAL_STEPS = 5;
 
 export function validateStep(
   step: StepIndex,
@@ -107,14 +116,15 @@ export function validateStep(
     }
   }
 
+  /* Автомобиль — шаг 1. Поля необязательные: клиент может рассказать о машине
+     мастеру по телефону. Но если он их заполнил — проверим формат. */
   if (step === 1) {
     const model = (input.vehicleModel ?? "").trim();
-    if (model.length < 2) errors.vehicleModel = "Укажите марку и модель, например Mercedes-Benz E-Класс.";
+    if (model.length === 1) errors.vehicleModel = "Укажите марку и модель полностью, например Kia Rio.";
     else if (model.length > 60) errors.vehicleModel = "Слишком длинно — до 60 символов.";
 
     const year = (input.vehicleYear ?? "").trim();
-    if (!year) errors.vehicleYear = "Укажите год выпуска.";
-    else if (!/^\d{4}$/.test(year) || Number(year) < 1950 || Number(year) > CURRENT_YEAR + 1) {
+    if (year && (!/^\d{4}$/.test(year) || Number(year) < 1950 || Number(year) > CURRENT_YEAR + 1)) {
       errors.vehicleYear = `Год — четыре цифры, от 1950 до ${CURRENT_YEAR + 1}.`;
     }
 
@@ -127,18 +137,16 @@ export function validateStep(
     if (comment.length > 500) errors.comment = "Опишите короче — до 500 символов.";
   }
 
+  /* Дата и время — на одном шаге: это одна мысль «когда приехать» */
   if (step === 2) {
     const date = (input.date ?? "").trim();
-    if (!date) errors.date = "Выберите дату визита.";
+    if (!date) errors.date = "Выберите день визита.";
     else if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) errors.date = "Некорректная дата.";
     else if (!isDateBookable(date, now.iso)) {
       errors.date = "В этот день сервис не работает. Выберите другую дату.";
     }
-  }
 
-  if (step === 3) {
     const time = (input.time ?? "").trim();
-    const date = (input.date ?? "").trim();
     if (!time) errors.time = "Выберите время визита.";
     else if (!date) errors.time = "Сначала выберите дату.";
     else {
@@ -148,7 +156,8 @@ export function validateStep(
     }
   }
 
-  if (step === 4) {
+  /* Контакты — шаг 3, обязательны */
+  if (step === 3) {
     const name = (input.name ?? "").trim();
     if (name.length < 2) errors.name = "Как к вам обращаться?";
     else if (name.length > 80) errors.name = "Слишком длинно — до 80 символов.";
@@ -207,7 +216,6 @@ export function validateBooking(
     ...validateStep(1, draft, now),
     ...validateStep(2, draft, now),
     ...validateStep(3, draft, now),
-    ...validateStep(4, draft, now),
   };
 
   if (Object.keys(errors).length > 0) return { ok: false, errors };
@@ -217,8 +225,10 @@ export function validateBooking(
     phone: normalisePhone(draft.phone!),
     channel: draft.channel!,
     telegram: draft.telegram,
-    vehicleModel: draft.vehicleModel!.trim(),
-    vehicleYear: draft.vehicleYear!.trim(),
+    /* Автомобиль не обязателен: пустые поля не пишем вовсе, чтобы в панели
+       заявок и в Telegram не появлялись строки вида «Авто: , » */
+    vehicleModel: draft.vehicleModel?.trim() || undefined,
+    vehicleYear: draft.vehicleYear?.trim() || undefined,
     vin: draft.vin,
     service: draft.service!,
     price: priceOf(draft.service!),

@@ -35,9 +35,13 @@ export interface Booking {
   phone: string;
   channel: ContactChannel;
   telegram?: string;
-  /** Марка и модель, например «Mercedes-Benz E-Класс (W211)» */
-  vehicleModel: string;
-  vehicleYear: string;
+  /**
+   * Марка и модель, например «Mercedes-Benz E-Класс (W211)».
+   * Не обязательна: запись упрощена до 3 шагов, данные об авто клиент может
+   * сообщить по телефону. Пустая строка и отсутствие поля — одно и то же.
+   */
+  vehicleModel?: string;
+  vehicleYear?: string;
   vin?: string;
   /** Услуга из прайса 2ГИС (или «Другое — опишу в комментарии») */
   service: string;

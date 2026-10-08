@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
 import "./globals.css";
 import { company, gisLink, photos, schedule } from "@/lib/company";
+import { serviceCards } from "@/lib/content";
+import { priceOf } from "@/lib/validation";
 import { siteUrl as siteUrlFromEnv } from "@/lib/site-url";
 
 const manrope = Manrope({
@@ -16,9 +18,9 @@ const manrope = Manrope({
  */
 const siteUrl = siteUrlFromEnv;
 
-const title = `${company.name} — автосервис в Кокшетау: ремонт стартеров, генераторов и ходовой`;
+const title = `${company.name} — автосервис в Кокшетау: стартеры и генераторы, двигатель, ходовая, диагностика`;
 const description =
-  "СТО Центр в Кокшетау: ремонт стартеров и генераторов, ремонт двигателя и ходовой части, компьютерная диагностика, развал-схождение, сварочные работы. Улица Шанырак, 6а/с. Пн–Пт 09:00–19:00, Сб 09:00–18:00. Телефон +7 (7162) 29-35-35.";
+  "СТО Центр в Кокшетау: ремонт стартеров и генераторов, бензиновых двигателей и ходовой части, компьютерная диагностика, развал-схождение, сварочные работы. Улица Шанырак, 6а/с. Пн–Пт 09:00–19:00, Сб 09:00–18:00. Прайс — 93 позиции, запись онлайн.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -33,6 +35,8 @@ export const metadata: Metadata = {
     "компьютерная диагностика Кокшетау",
     "развал-схождение Кокшетау",
     "ремонт ходовой Кокшетау",
+    "ремонт двигателя Кокшетау",
+    "СТО Центр Кокшетау",
   ],
   alternates: { canonical: "/" },
   openGraph: {
@@ -61,17 +65,21 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0c0f13",
+  themeColor: "#08090c",
   width: "device-width",
   initialScale: 1,
 };
 
-/** LocalBusiness (AutoRepair) — только подтверждённые карточкой 2ГИС данные. */
+/**
+ * LocalBusiness (AutoRepair) — только подтверждённые карточкой 2ГИС данные.
+ * Каталог предложений собран из реальных позиций прайса с их ценами.
+ */
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "AutoRepair",
   name: company.name,
   description,
+  url: siteUrl,
   image: photos.map((p) => new URL(p.src, siteUrl).toString()),
   address: {
     "@type": "PostalAddress",
@@ -102,6 +110,24 @@ const jsonLd = {
     reviewCount: String(company.rating.votes),
     bestRating: "5",
   },
+  areaServed: {
+    "@type": "City",
+    name: company.address.city,
+  },
+  makesOffer: serviceCards
+    .map((card) => ({ card, price: priceOf(card.name) }))
+    .filter((entry) => entry.price !== null)
+    .map(({ card, price }) => ({
+      "@type": "Offer",
+      priceCurrency: "KZT",
+      price: String(price),
+      itemOffered: {
+        "@type": "Service",
+        name: card.name,
+        areaServed: company.address.city,
+      },
+    })),
+  knowsAbout: [...company.rubrics],
   sameAs: [gisLink],
 };
 
@@ -110,7 +136,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ru" className={manrope.variable}>
-      <body className="font-sans antialiased">
+      <body className="bg-ink font-sans antialiased">
         {children}
         <script
           type="application/ld+json"
